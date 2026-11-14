@@ -36,24 +36,59 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Adapter l'orientation de la vidéo selon celle de l'iPhone
+// Adapter l'orientation et les dimensions de la vidéo reçue
 function updateRemoteScreenRatio() {
     const width = remoteScreen.videoWidth;
     const height = remoteScreen.videoHeight;
 
     if (!width || !height) return;
 
+    const ratio = width / height;
+
+    const availableWidth = Math.min(
+        receiverArea.clientWidth || window.innerWidth,
+        window.innerWidth - 32
+    );
+
+    const availableHeight = Math.max(
+        200,
+        window.innerHeight - 220
+    );
+
+    let displayWidth;
+    let displayHeight;
+
     if (width > height) {
         // iPhone en paysage : rotation de 90° vers la gauche
+        displayWidth = Math.min(
+            availableHeight,
+            availableWidth * ratio
+        );
+
+        displayHeight = displayWidth / ratio;
+
         remoteScreen.style.transform = "rotate(-90deg)";
     } else {
         // iPhone en portrait : aucune rotation
+        displayWidth = Math.min(
+            availableWidth,
+            availableHeight * ratio
+        );
+
+        displayHeight = displayWidth / ratio;
+
         remoteScreen.style.transform = "none";
     }
+
+    remoteScreen.style.width = `${displayWidth}px`;
+    remoteScreen.style.height = `${displayHeight}px`;
 }
 
 remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
 remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
+
+window.addEventListener("resize", updateRemoteScreenRatio);
+window.addEventListener("orientationchange", updateRemoteScreenRatio);
 
 // Variables générales
 let connected = false;
