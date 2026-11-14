@@ -36,18 +36,18 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Rotation de la vidéo selon l'orientation de l'iPhone
+// Adapter l'orientation de la vidéo selon celle de l'iPhone
 function updateRemoteScreenRatio() {
     const width = remoteScreen.videoWidth;
     const height = remoteScreen.videoHeight;
 
     if (!width || !height) return;
 
-    if (height > width) {
-        // iPhone en portrait : rotation de 90° vers la gauche
+    if (width > height) {
+        // iPhone en paysage : rotation de 90° vers la gauche
         remoteScreen.style.transform = "rotate(-90deg)";
     } else {
-        // iPhone en paysage : aucune rotation
+        // iPhone en portrait : aucune rotation
         remoteScreen.style.transform = "none";
     }
 }
@@ -181,7 +181,9 @@ function createPeerConnection(sessionId) {
             remoteScreenStatus.textContent =
                 "Écran de l'iPhone reçu.";
 
-            remoteScreen.play().catch(() => {
+            remoteScreen.play().then(() => {
+                updateRemoteScreenRatio();
+            }).catch(() => {
                 remoteScreenStatus.textContent =
                     "Appuie sur la vidéo pour lancer l'affichage.";
             });
