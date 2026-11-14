@@ -70,3 +70,76 @@ button:hover {
     background: #000;
     margin: 0 auto;
 }
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101827;
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+h1 {
+    font-size: 48px;
+    color: #ffffff;
+}
+
+body > p {
+    color: #aab4c5;
+}
+
+.connexion {
+    background: #1c293c;
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border: 1px solid #52627a;
+    background: #101827;
+    color: white;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    background: #2878ff;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1763df;
+}
+
+#message {
+    color: #65a3ff;
+    margin-top: 20px;
+}
+
+/* Adaptation de la vidéo reçue */
+#remoteScreen {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    background: #000;
+    margin: 0 auto;
+    transform-origin: center center;
+}

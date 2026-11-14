@@ -36,40 +36,24 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Adapter la taille de la vidéo à son orientation réelle
+// Rotation de la vidéo selon l'orientation de l'iPhone
 function updateRemoteScreenRatio() {
     const width = remoteScreen.videoWidth;
     const height = remoteScreen.videoHeight;
 
     if (!width || !height) return;
 
-    const ratio = width / height;
-
-    const availableWidth = Math.min(
-        receiverArea.clientWidth || window.innerWidth,
-        window.innerWidth - 32
-    );
-
-    const availableHeight = window.innerHeight * 0.82;
-
-    const displayWidth = Math.min(
-        availableWidth,
-        availableHeight * ratio
-    );
-
-    const displayHeight = displayWidth / ratio;
-
-    remoteScreen.style.width = `${displayWidth}px`;
-    remoteScreen.style.height = `${displayHeight}px`;
-    remoteScreen.style.maxWidth = "none";
-    remoteScreen.style.aspectRatio = `${width} / ${height}`;
+    if (height > width) {
+        // iPhone en portrait : rotation de 90° vers la gauche
+        remoteScreen.style.transform = "rotate(-90deg)";
+    } else {
+        // iPhone en paysage : aucune rotation
+        remoteScreen.style.transform = "none";
+    }
 }
 
 remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
 remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
-
-window.addEventListener("resize", updateRemoteScreenRatio);
-window.addEventListener("orientationchange", updateRemoteScreenRatio);
 
 // Variables générales
 let connected = false;
@@ -288,6 +272,7 @@ function cleanupScreenSharing() {
 
     screenPreview.srcObject = null;
     remoteScreen.srcObject = null;
+    remoteScreen.style.transform = "none";
 
     startScreenShare.disabled = false;
     stopScreenShare.disabled = true;
@@ -401,7 +386,6 @@ socket.on("webrtc-offer", async (data) => {
 
     const { sessionId, description } = data;
 
-    // Ignorer une offre déjà traitée.
     if (peerConnection) {
         return;
     }
