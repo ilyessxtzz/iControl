@@ -23,7 +23,7 @@ const statusDot = document.getElementById("statusDot");
 const statusText = document.getElementById("statusText");
 const messageHistory = document.getElementById("messageHistory");
 
-// Afficher les chiffres dans les six emplacements
+// Affichage du code à six chiffres
 function updateCodeDisplay() {
     codeInput.value = codeInput.value
         .replace(/\D/g, "")
@@ -40,9 +40,7 @@ function updateCodeDisplay() {
 }
 
 codeInput.addEventListener("input", updateCodeDisplay);
-
 codeInput.addEventListener("focus", updateCodeDisplay);
-
 codeInput.addEventListener("blur", updateCodeDisplay);
 
 // Éléments du partage d'écran
@@ -59,22 +57,9 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Adapter l'orientation de la vidéo selon celle de l'iPhone
-function updateRemoteScreenRatio() {
-    const width = remoteScreen.videoWidth;
-    const height = remoteScreen.videoHeight;
-
-    if (!width || !height) return;
-
-    if (width > height) {
-        remoteScreen.style.transform = "rotate(-90deg)";
-    } else {
-        remoteScreen.style.transform = "none";
-    }
-}
-
-remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
-remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
+const touchSurface = document.getElementById("touchSurface");
+const senderPointer = document.getElementById("senderPointer");
+const touchStatus = document.getElementById("touchStatus");
 
 // Variables générales
 let connected = false;
@@ -82,21 +67,20 @@ let hasMessages = false;
 let isHost = false;
 let isLeaving = false;
 
-// Variables WebRTC
 let peerConnection = null;
 let screenStream = null;
 let activeSessionId = null;
 
-// Les candidats sont conservés séparément pour chaque session.
 const pendingCandidates = new Map();
 
 const rtcConfiguration = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" }
-    ]
+    ],
+    bundlePolicy: "max-bundle"
 };
 
-// Créer un identifiant de session
+// Identifiant de session
 function createSessionId() {
     return Date.now().toString(36) +
         Math.random().toString(36).slice(2);
@@ -115,7 +99,7 @@ function updateStatus(isConnected) {
         : "red";
 }
 
-// Afficher un message
+// Messages
 function addMessage(text, sender) {
     if (!hasMessages) {
         messageHistory.innerHTML = "";
@@ -128,24 +112,37 @@ function addMessage(text, sender) {
     messageHistory.appendChild(item);
 }
 
-// Afficher le panneau
 function showControls() {
     controlArea.hidden = false;
     updateStatus(true);
 }
 
-// Afficher la bonne interface de partage
 function showScreenShareInterface() {
     screenShareArea.hidden = false;
     senderArea.hidden = !isHost;
     receiverArea.hidden = isHost;
 }
 
-// Créer la connexion WebRTC
-function createPeerConnection(sessionId) {
-    if (peerConnection) {
-        return peerConnection;
+// Orientation de la vidéo distante
+function updateRemoteScreenRatio() {
+    const width = remoteScreen.videoWidth;
+    const height = remoteScreen.videoHeight;
+
+    if (!width || !height) return;
+
+    if (width > height) {
+        remoteScreen.style.transform = "rotate(-90deg)";
+    } else {
+        remoteScreen.style.transform = "none";
     }
+}
+
+remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
+remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
+
+// Connexion WebRTC
+function createPeerConnection(sessionId) {
+    if (peerConnection) return peerConnection;
 
     activeSessionId = sessionId;
 
@@ -214,7 +211,7 @@ function createPeerConnection(sessionId) {
     return pc;
 }
 
-// Ajouter les candidats en attente d'une session
+// Candidats ICE en attente
 async function addPendingCandidates(sessionId) {
     const pc = peerConnection;
 
@@ -245,7 +242,6 @@ async function addPendingCandidates(sessionId) {
     }
 }
 
-// Réception d'un candidat ICE
 socket.on("webrtc-ice-candidate", async (data) => {
     if (!data || !data.sessionId || !data.candidate) return;
 
@@ -271,13 +267,10 @@ socket.on("webrtc-ice-candidate", async (data) => {
     }
 });
 
-// Nettoyer le partage d'écran
+// Nettoyage du partage
 function cleanupScreenSharing() {
     if (screenStream) {
-        screenStream.getTracks().forEach((track) => {
-            track.stop();
-        });
-
+        screenStream.getTracks().forEach((track) => track.stop());
         screenStream = null;
     }
 
@@ -297,11 +290,12 @@ function cleanupScreenSharing() {
     remoteScreen.srcObject = null;
     remoteScreen.style.transform = "none";
 
+    senderPointer.hidden = true;
+
     startScreenShare.disabled = false;
     stopScreenShare.disabled = true;
 }
 
-// Arrêter le partage et prévenir l'autre appareil
 function stopScreenSharing(notifyPeer = true) {
     const sessionId = activeSessionId;
 
@@ -311,24 +305,20 @@ function stopScreenSharing(notifyPeer = true) {
 
     cleanupScreenSharing();
 
-    screenShareStatus.textContent =
-        "Aucun partage en cours.";
-
-    remoteScreenStatus.textContent =
-        "En attente du partage...";
+    screenShareStatus.textContent = "Aucun partage en cours.";
+    remoteScreenStatus.textContent = "En attente du partage...";
+    touchStatus.textContent = "En attente d'un toucher...";
 }
 
-// L'iPhone démarre le partage
+// Démarrer le partage depuis l'iPhone
 startScreenShare.addEventListener("click", async () => {
     if (!isHost || !connected) {
-        screenShareStatus.textContent =
-            "Aucun iPad connecté.";
+        screenShareStatus.textContent = "Aucun iPad connecté.";
         return;
     }
 
     if (peerConnection) {
-        screenShareStatus.textContent =
-            "Un partage est déjà en cours.";
+        screenShareStatus.textContent = "Un partage est déjà en cours.";
         return;
     }
 
@@ -345,15 +335,29 @@ startScreenShare.addEventListener("click", async () => {
         screenShareStatus.textContent =
             "Demande d'autorisation de partage...";
 
-        const stream =
-            await navigator.mediaDevices.getDisplayMedia({
-                video: true,
-                audio: false
-            });
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+                frameRate: {
+                    ideal: 60,
+                    max: 60
+                }
+            },
+            audio: false
+        });
 
         screenStream = stream;
 
         const track = stream.getVideoTracks()[0];
+
+        track.applyConstraints({
+            frameRate: {
+                ideal: 60,
+                max: 60
+            }
+        }).catch((error) => {
+            console.log("Optimisation FPS non appliquée :", error);
+        });
+
         console.log("Dimensions capturées :", track.getSettings());
 
         screenPreview.srcObject = stream;
@@ -367,7 +371,6 @@ startScreenShare.addEventListener("click", async () => {
         });
 
         const offer = await pc.createOffer();
-
         await pc.setLocalDescription(offer);
 
         socket.emit("webrtc-offer", {
@@ -378,18 +381,13 @@ startScreenShare.addEventListener("click", async () => {
         startScreenShare.disabled = true;
         stopScreenShare.disabled = false;
 
-        screenShareStatus.textContent =
-            "Connexion vidéo en cours...";
+        screenShareStatus.textContent = "Connexion vidéo en cours...";
 
-        stream.getVideoTracks()[0].addEventListener(
-            "ended",
-            () => {
-                if (activeSessionId === sessionId) {
-                    stopScreenSharing(true);
-                }
-            },
-            { once: true }
-        );
+        track.addEventListener("ended", () => {
+            if (activeSessionId === sessionId) {
+                stopScreenSharing(true);
+            }
+        }, { once: true });
 
     } catch (error) {
         console.error("Erreur de partage :", error);
@@ -401,7 +399,7 @@ startScreenShare.addEventListener("click", async () => {
     }
 });
 
-// L'iPad reçoit l'offre de l'iPhone
+// Réception de l'offre sur l'iPad
 socket.on("webrtc-offer", async (data) => {
     if (isHost || !data || !data.sessionId || !data.description) {
         return;
@@ -409,9 +407,7 @@ socket.on("webrtc-offer", async (data) => {
 
     const { sessionId, description } = data;
 
-    if (peerConnection) {
-        return;
-    }
+    if (peerConnection) return;
 
     try {
         const pc = createPeerConnection(sessionId);
@@ -423,7 +419,6 @@ socket.on("webrtc-offer", async (data) => {
         await addPendingCandidates(sessionId);
 
         const answer = await pc.createAnswer();
-
         await pc.setLocalDescription(answer);
 
         socket.emit("webrtc-answer", {
@@ -444,7 +439,7 @@ socket.on("webrtc-offer", async (data) => {
     }
 });
 
-// L'iPhone reçoit la réponse de l'iPad
+// Réponse reçue sur l'iPhone
 socket.on("webrtc-answer", async (data) => {
     if (
         !isHost ||
@@ -463,40 +458,101 @@ socket.on("webrtc-answer", async (data) => {
         );
 
         await addPendingCandidates(data.sessionId);
-
     } catch (error) {
         console.error("Erreur de réponse WebRTC :", error);
     }
 });
 
-// L'autre appareil arrête le partage
+// Arrêt du partage par l'autre appareil
 socket.on("webrtc-stop", (data) => {
-    if (
-        !data ||
-        data.sessionId !== activeSessionId
-    ) {
-        return;
-    }
+    if (!data || data.sessionId !== activeSessionId) return;
 
     cleanupScreenSharing();
 
-    screenShareStatus.textContent =
-        "Aucun partage en cours.";
-
+    screenShareStatus.textContent = "Aucun partage en cours.";
     remoteScreenStatus.textContent =
         "Le partage a été arrêté par l'iPhone.";
 });
 
-// Arrêter le partage avec le bouton
+// Bouton d'arrêt
 stopScreenShare.addEventListener("click", () => {
     stopScreenSharing(true);
+});
+
+// EXPÉRIMENTATION : toucher sur l'iPad
+let lastTouchSent = 0;
+
+touchSurface.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    touchSurface.setPointerCapture(event.pointerId);
+    sendTouchCoordinates(event, "move");
+});
+
+touchSurface.addEventListener("pointermove", (event) => {
+    if (event.buttons === 0 && event.pointerType !== "touch") return;
+
+    event.preventDefault();
+    sendTouchCoordinates(event, "move");
+});
+
+touchSurface.addEventListener("pointerup", (event) => {
+    event.preventDefault();
+    sendTouchCoordinates(event, "end");
+});
+
+touchSurface.addEventListener("pointercancel", () => {
+    touchStatus.textContent = "Toucher interrompu.";
+});
+
+function sendTouchCoordinates(event, action) {
+    if (!connected || isHost || !peerConnection) {
+        touchStatus.textContent = "Partage vidéo non connecté.";
+        return;
+    }
+
+    const rect = touchSurface.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) return;
+
+    const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+
+    const now = performance.now();
+
+    if (action !== "end" && now - lastTouchSent < 30) return;
+
+    lastTouchSent = now;
+
+    socket.emit("remote-touch", { x, y, action });
+
+    touchStatus.textContent =
+        `Position transmise : ${Math.round(x * 100)} % / ${Math.round(y * 100)} %`;
+}
+
+// Réception des coordonnées sur l'iPhone
+socket.on("remote-touch", (data) => {
+    if (!isHost || !data) return;
+
+    const x = Math.max(0, Math.min(1, data.x));
+    const y = Math.max(0, Math.min(1, data.y));
+
+    senderPointer.style.left = `${x * 100}%`;
+    senderPointer.style.top = `${y * 100}%`;
+    senderPointer.hidden = false;
+
+    if (data.action === "end") {
+        setTimeout(() => {
+            senderPointer.hidden = true;
+        }, 350);
+    }
+
+    console.log("Coordonnées reçues de l'iPad :", x, y);
 });
 
 // Créer une session depuis l'iPhone
 iphoneBtn.addEventListener("click", () => {
     if (!socket.connected) {
-        message.textContent =
-            "Connexion au serveur en cours...";
+        message.textContent = "Connexion au serveur en cours...";
         return;
     }
 
@@ -512,8 +568,7 @@ iphoneBtn.addEventListener("click", () => {
             generatedCode.textContent = result.code;
             message.textContent = "En attente de l'iPad...";
         } else {
-            message.textContent =
-                "Impossible de créer la connexion.";
+            message.textContent = "Impossible de créer la connexion.";
         }
     });
 });
@@ -533,14 +588,12 @@ joinBtn.addEventListener("click", () => {
     const code = codeInput.value.trim();
 
     if (!/^\d{6}$/.test(code)) {
-        message.textContent =
-            "Entre un code valide à 6 chiffres.";
+        message.textContent = "Entre un code valide à 6 chiffres.";
         return;
     }
 
     if (!socket.connected) {
-        message.textContent =
-            "Connexion au serveur en cours...";
+        message.textContent = "Connexion au serveur en cours...";
         return;
     }
 
@@ -553,8 +606,7 @@ joinBtn.addEventListener("click", () => {
             showControls();
             showScreenShareInterface();
 
-            remoteScreenStatus.textContent =
-                "En attente du partage...";
+            remoteScreenStatus.textContent = "En attente du partage...";
         } else {
             message.textContent = result.message;
             updateStatus(false);
@@ -573,14 +625,10 @@ socket.on("peer-joined", () => {
 // L'autre appareil quitte
 socket.on("peer-left", () => {
     updateStatus(false);
-
     stopScreenSharing(false);
 
-    message.textContent =
-        "L'autre appareil s'est déconnecté.";
-
-    remoteScreenStatus.textContent =
-        "En attente de reconnexion...";
+    message.textContent = "L'autre appareil s'est déconnecté.";
+    remoteScreenStatus.textContent = "En attente de reconnexion...";
 });
 
 // Envoyer un message
@@ -600,14 +648,12 @@ sendBtn.addEventListener("click", () => {
     messageInput.value = "";
 });
 
-// Envoyer avec Entrée
 messageInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         sendBtn.click();
     }
 });
 
-// Recevoir un message
 socket.on("receive-message", (text) => {
     addMessage(text, "Autre appareil");
 });
@@ -617,7 +663,6 @@ leaveBtn.addEventListener("click", () => {
     isLeaving = true;
 
     stopScreenSharing(true);
-
     socket.disconnect();
 
     controlArea.hidden = true;
@@ -630,22 +675,17 @@ leaveBtn.addEventListener("click", () => {
     updateCodeDisplay();
 
     messageInput.value = "";
-
     message.textContent = "Tu as quitté la session.";
 
-    messageHistory.innerHTML =
-        "<p>Aucun message pour le moment.</p>";
-
+    messageHistory.innerHTML = "<p>Aucun message pour le moment.</p>";
     hasMessages = false;
     isHost = false;
 
     updateStatus(false);
 
-    screenShareStatus.textContent =
-        "Aucun partage en cours.";
-
-    remoteScreenStatus.textContent =
-        "En attente du partage...";
+    screenShareStatus.textContent = "Aucun partage en cours.";
+    remoteScreenStatus.textContent = "En attente du partage...";
+    touchStatus.textContent = "En attente d'un toucher.";
 
     socket.connect();
 });

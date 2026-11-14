@@ -86,26 +86,34 @@
             <button id="stopScreenShare" disabled>Arrêter le partage</button>
             <p id="screenShareStatus">Aucun partage en cours.</p>
 
-            <video
-                id="screenPreview"
-                autoplay
-                playsinline
-                muted
-                style="width:100%; max-width:500px;"
-            ></video>
+            <div class="video-container" id="senderVideoContainer">
+                <video
+                    id="screenPreview"
+                    autoplay
+                    playsinline
+                    muted
+                ></video>
+                <div id="senderPointer" class="remote-pointer" hidden></div>
+            </div>
         </div>
 
         <div id="receiverArea" hidden>
             <h3>Écran de l'iPhone</h3>
             <p id="remoteScreenStatus">En attente du partage...</p>
+            <p class="touch-instruction">
+                Mode expérimental : touche la vidéo pour transmettre la position.
+            </p>
 
-            <video
-                id="remoteScreen"
-                autoplay
-                playsinline
-                controls
-                style="width:100%; max-width:700px; background:#111;"
-            ></video>
+            <div class="video-container" id="receiverVideoContainer">
+                <video
+                    id="remoteScreen"
+                    autoplay
+                    playsinline
+                ></video>
+                <div id="touchSurface" aria-label="Surface expérimentale de toucher"></div>
+            </div>
+
+            <p id="touchStatus">En attente d'un toucher...</p>
         </div>
     </div>
 

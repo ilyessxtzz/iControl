@@ -1,8 +1,4 @@
 
-/* ================================
-   iCONTROL — DESIGN APPLE
-================================ */
-
 * {
     box-sizing: border-box;
 }
@@ -19,7 +15,6 @@ body {
     padding: 65px 20px;
     text-align: center;
     color: #f5f5f7;
-
     background:
         radial-gradient(ellipse at 50% 0%, #1c3152 0%, transparent 55%),
         linear-gradient(145deg, #080b12, #111827 65%, #090d15);
@@ -50,8 +45,6 @@ body > p {
     font-size: 16px;
 }
 
-/* Cartes */
-
 .connexion,
 #controlArea,
 #screenShareArea {
@@ -59,15 +52,12 @@ body > p {
     max-width: 650px;
     margin: 30px auto;
     padding: 30px;
-
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 24px;
-
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
-
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
 }
@@ -77,16 +67,12 @@ body > p {
     margin-top: 45px;
 }
 
-/* Code de connexion généré */
-
 #generatedCode {
     font-size: 42px;
     letter-spacing: 9px;
     color: #65aaff;
     font-weight: 700;
 }
-
-/* Champ à six chiffres */
 
 .code-entry {
     position: relative;
@@ -109,14 +95,11 @@ body > p {
     display: flex;
     align-items: center;
     justify-content: center;
-
     min-width: 0;
     height: 100%;
-
     color: #ffffff;
     font-size: 27px;
     font-weight: 600;
-
     border-bottom: 2px solid rgba(255, 255, 255, 0.3);
     transition: border-color 0.2s;
 }
@@ -129,22 +112,17 @@ body > p {
     border-color: #65aaff;
 }
 
-/* Champ réel invisible, mais utilisable */
-
 #code {
     position: absolute;
     inset: 0;
     z-index: 2;
-
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
-
     opacity: 0.01;
     color: transparent;
     caret-color: transparent;
-
     background: transparent;
     border: none;
     outline: none;
@@ -152,23 +130,17 @@ body > p {
     cursor: text;
 }
 
-/* Champs de texte classiques */
-
 input:not(#code) {
     display: block;
     width: 100%;
     padding: 16px 18px;
     margin: 16px 0;
-
     color: white;
     background: rgba(0, 0, 0, 0.22);
-
     border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: 14px;
-
     font-size: 16px;
     outline: none;
-
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -181,22 +153,16 @@ input::placeholder {
     color: #8993a4;
 }
 
-/* Boutons */
-
 button {
     width: 100%;
     padding: 15px 20px;
     margin: 7px 0;
-
     color: white;
     background: #0a84ff;
-
     border: none;
     border-radius: 14px;
-
     font-size: 16px;
     font-weight: 600;
-
     cursor: pointer;
     transition:
         background 0.2s,
@@ -219,8 +185,6 @@ button:disabled {
     transform: none;
 }
 
-/* Messages */
-
 #message {
     color: #64adff;
     margin-top: 20px;
@@ -231,13 +195,10 @@ button:disabled {
     padding: 12px;
     margin: 15px 0;
     text-align: left;
-
     background: rgba(0, 0, 0, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 14px;
 }
-
-/* État de connexion */
 
 #connectionStatus {
     color: #aab4c5;
@@ -247,28 +208,62 @@ button:disabled {
     color: #ff453a;
 }
 
-/* Vidéos */
-
-video {
-    display: block;
-    max-width: 100%;
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
     margin: 18px auto;
+    overflow: hidden;
     border-radius: 18px;
     background: #000;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
 }
 
-#remoteScreen {
-    transform-origin: center center;
+.video-container video {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #000;
 }
 
-/* Éléments masqués */
+#senderVideoContainer {
+    max-width: 500px;
+}
+
+#touchSurface {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.remote-pointer {
+    position: absolute;
+    z-index: 4;
+    width: 22px;
+    height: 22px;
+    border: 3px solid white;
+    border-radius: 50%;
+    background: rgba(10, 132, 255, 0.7);
+    box-shadow: 0 0 0 5px rgba(10, 132, 255, 0.25);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.touch-instruction,
+#touchStatus {
+    color: #aab4c5;
+    font-size: 14px;
+}
 
 [hidden] {
     display: none !important;
 }
-
-/* Adaptation mobile */
 
 @media (max-width: 600px) {
     body {
