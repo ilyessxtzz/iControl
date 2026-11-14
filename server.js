@@ -1,4 +1,3 @@
-
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -23,6 +22,7 @@ function generateCode() {
     return code;
 }
 
+// Transmettre un signal uniquement à l'autre appareil
 function relayToPeer(socket, event, data) {
     const code = socket.data.roomCode;
     const room = rooms.get(code);
@@ -38,6 +38,7 @@ function relayToPeer(socket, event, data) {
 
 io.on("connection", (socket) => {
 
+    // Créer une session
     socket.on("create-room", (callback) => {
         const code = generateCode();
 
@@ -54,6 +55,7 @@ io.on("connection", (socket) => {
         }
     });
 
+    // Rejoindre une session
     socket.on("join-room", (code, callback) => {
         code = String(code).trim();
 
@@ -90,6 +92,7 @@ io.on("connection", (socket) => {
         }
     });
 
+    // Transmission des messages
     socket.on("send-message", (text) => {
         const code = socket.data.roomCode;
         const room = rooms.get(code);
@@ -103,30 +106,7 @@ io.on("connection", (socket) => {
         socket.to(code).emit("receive-message", text.slice(0, 300));
     });
 
-    // Coordonnées tactiles : uniquement de l'iPad vers l'iPhone
-    socket.on("remote-touch", (data) => {
-        const code = socket.data.roomCode;
-        const room = rooms.get(code);
-
-        if (!room || room.guest !== socket.id) return;
-        if (!data || typeof data.x !== "number" || typeof data.y !== "number") return;
-
-        if (
-            !Number.isFinite(data.x) ||
-            !Number.isFinite(data.y) ||
-            data.x < 0 || data.x > 1 ||
-            data.y < 0 || data.y > 1
-        ) {
-            return;
-        }
-
-        io.to(room.host).emit("remote-touch", {
-            x: data.x,
-            y: data.y,
-            action: data.action === "end" ? "end" : "move"
-        });
-    });
-
+    // Signaux WebRTC
     socket.on("webrtc-offer", (offer) => {
         relayToPeer(socket, "webrtc-offer", offer);
     });
@@ -138,11 +118,10 @@ io.on("connection", (socket) => {
     socket.on("webrtc-ice-candidate", (candidate) => {
         relayToPeer(socket, "webrtc-ice-candidate", candidate);
     });
-
-    socket.on("webrtc-stop", (data) => {
-        relayToPeer(socket, "webrtc-stop", data);
-    });
-
+socket.on("webrtc-stop", (data) => {
+    relayToPeer(socket, "webrtc-stop", data);
+});
+    // Déconnexion
     socket.on("disconnect", () => {
         const code = socket.data.roomCode;
         const room = rooms.get(code);
