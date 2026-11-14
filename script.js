@@ -1,3 +1,4 @@
+
 const socket = io();
 
 const iphoneBtn = document.getElementById("iphoneBtn");
@@ -11,6 +12,15 @@ const codeInput = document.getElementById("code");
 const joinBtn = document.getElementById("joinBtn");
 const message = document.getElementById("message");
 
+// Éléments de communication
+const controlArea = document.getElementById("controlArea");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const receivedMessage = document.getElementById("receivedMessage");
+
+let connected = false;
+
+// Création d'une session depuis l'iPhone
 iphoneBtn.addEventListener("click", () => {
     iphoneArea.hidden = false;
     ipadArea.hidden = true;
@@ -26,12 +36,14 @@ iphoneBtn.addEventListener("click", () => {
     });
 });
 
+// Rejoindre une session depuis l'iPad
 ipadBtn.addEventListener("click", () => {
     ipadArea.hidden = false;
     iphoneArea.hidden = true;
     message.textContent = "";
 });
 
+// Entrer le code
 joinBtn.addEventListener("click", () => {
     const code = codeInput.value.trim();
 
@@ -44,17 +56,61 @@ joinBtn.addEventListener("click", () => {
 
     socket.emit("join-room", code, (result) => {
         if (result.success) {
+            connected = true;
             message.textContent = "iPad connecté à la session !";
+            showControls();
         } else {
             message.textContent = result.message;
         }
     });
 });
 
+// Quand l'iPad rejoint l'iPhone
 socket.on("peer-joined", () => {
+    connected = true;
     message.textContent = "Ton iPad est connecté !";
+    showControls();
 });
 
+// Quand un appareil se déconnecte
 socket.on("peer-left", () => {
+    connected = false;
     message.textContent = "L'autre appareil s'est déconnecté.";
+
+    if (controlArea) {
+        controlArea.hidden = true;
+    }
+});
+
+// Afficher les commandes
+function showControls() {
+    if (controlArea) {
+        controlArea.hidden = false;
+    }
+}
+
+// Envoyer un message à l'autre appareil
+if (sendBtn) {
+    sendBtn.addEventListener("click", () => {
+        const text = messageInput.value.trim();
+
+        if (!connected) {
+            receivedMessage.textContent = "Aucun appareil connecté.";
+            return;
+        }
+
+        if (!text) {
+            return;
+        }
+
+        socket.emit("send-message", text);
+        messageInput.value = "";
+    });
+}
+
+// Recevoir un message de l'autre appareil
+socket.on("receive-message", (text) => {
+    if (receivedMessage) {
+        receivedMessage.textContent = text;
+    }
 });

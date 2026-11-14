@@ -32,7 +32,12 @@
 
         <p id="message"></p>
     </div>
-
+    <div id="controlArea" hidden>
+    <h2>Panneau de contrôle</h2>
+    <input id="messageInput" type="text" placeholder="Écris un message">
+    <button id="sendBtn">Envoyer</button>
+    <p id="receivedMessage"></p>
+</div>
     <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
 </body>
