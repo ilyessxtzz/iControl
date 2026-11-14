@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iControl</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>iControl</h1>
+    <p>Connecte tes appareils en toute simplicité.</p>
+
+    <div class="connexion">
+        <h2>Choisis ton appareil</h2>
+
+        <button id="iphoneBtn">Je suis sur iPhone</button>
+        <button id="ipadBtn">Je suis sur iPad</button>
+
+        <div id="iphoneArea" hidden>
+            <h2>Ton code de connexion</h2>
+            <h1 id="generatedCode">------</h1>
+            <p>Entre ce code sur ton iPad.</p>
+        </div>
+
+        <div id="ipadArea" hidden>
+            <h2>Rejoindre un iPhone</h2>
+            <input type="text" id="code" placeholder="Entre le code de connexion">
+            <button id="joinBtn">Rejoindre</button>
+        </div>
+
+        <p id="message"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
