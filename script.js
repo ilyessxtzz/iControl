@@ -12,15 +12,51 @@ const codeInput = document.getElementById("code");
 const joinBtn = document.getElementById("joinBtn");
 const message = document.getElementById("message");
 
-// Éléments de communication
 const controlArea = document.getElementById("controlArea");
 const messageInput = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
-const receivedMessage = document.getElementById("receivedMessage");
+const leaveBtn = document.getElementById("leaveBtn");
+
+const statusDot = document.getElementById("statusDot");
+const statusText = document.getElementById("statusText");
+const messageHistory = document.getElementById("messageHistory");
 
 let connected = false;
+let hasMessages = false;
 
-// Création d'une session depuis l'iPhone
+// État de connexion
+function updateStatus(isConnected) {
+    connected = isConnected;
+
+    statusText.textContent = isConnected
+        ? "Connecté"
+        : "Déconnecté";
+
+    statusDot.style.color = isConnected
+        ? "green"
+        : "red";
+}
+
+// Afficher un message dans l'historique
+function addMessage(text, sender) {
+    if (!hasMessages) {
+        messageHistory.innerHTML = "";
+        hasMessages = true;
+    }
+
+    const item = document.createElement("p");
+    item.textContent = sender + " : " + text;
+
+    messageHistory.appendChild(item);
+}
+
+// Afficher le panneau
+function showControls() {
+    controlArea.hidden = false;
+    updateStatus(true);
+}
+
+// Créer une session depuis l'iPhone
 iphoneBtn.addEventListener("click", () => {
     iphoneArea.hidden = false;
     ipadArea.hidden = true;
@@ -36,7 +72,7 @@ iphoneBtn.addEventListener("click", () => {
     });
 });
 
-// Rejoindre une session depuis l'iPad
+// Rejoindre depuis l'iPad
 ipadBtn.addEventListener("click", () => {
     ipadArea.hidden = false;
     iphoneArea.hidden = true;
@@ -56,72 +92,87 @@ joinBtn.addEventListener("click", () => {
 
     socket.emit("join-room", code, (result) => {
         if (result.success) {
-            connected = true;
-            message.textContent = "iPad connecté à la session !";
+            message.textContent = "Connexion réussie !";
             showControls();
         } else {
             message.textContent = result.message;
+            updateStatus(false);
         }
     });
 });
 
-// Quand l'iPad rejoint l'iPhone
+// L'iPad rejoint l'iPhone
 socket.on("peer-joined", () => {
-    connected = true;
     message.textContent = "Ton iPad est connecté !";
     showControls();
 });
 
-// Quand un appareil se déconnecte
+// L'autre appareil quitte
 socket.on("peer-left", () => {
-    connected = false;
+    updateStatus(false);
     message.textContent = "L'autre appareil s'est déconnecté.";
+});
 
-    if (controlArea) {
-        controlArea.hidden = true;
+// Envoyer un message
+sendBtn.addEventListener("click", () => {
+    const text = messageInput.value.trim();
+
+    if (!connected) {
+        message.textContent = "Aucun appareil connecté.";
+        return;
+    }
+
+    if (!text) return;
+
+    socket.emit("send-message", text);
+    addMessage(text, "Moi");
+    messageInput.value = "";
+});
+
+// Envoyer avec la touche Entrée
+messageInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        sendBtn.click();
     }
 });
 
-// Afficher les commandes
-function showControls() {
-    if (controlArea) {
-        controlArea.hidden = false;
-    }
-}
-
-// Envoyer un message à l'autre appareil
-if (sendBtn) {
-    sendBtn.addEventListener("click", () => {
-        const text = messageInput.value.trim();
-
-        if (!connected) {
-            receivedMessage.textContent = "Aucun appareil connecté.";
-            return;
-        }
-
-        if (!text) {
-            return;
-        }
-
-        socket.emit("send-message", text);
-        messageInput.value = "";
-    });
-}
-
-// Recevoir un message de l'autre appareil
+// Recevoir un message
 socket.on("receive-message", (text) => {
-    if (receivedMessage) {
-        receivedMessage.textContent = text;
-    }
+    addMessage(text, "Autre appareil");
 });
+
+// Quitter la session
+leaveBtn.addEventListener("click", () => {
+    socket.disconnect();
+
+    controlArea.hidden = true;
+    iphoneArea.hidden = true;
+    ipadArea.hidden = true;
+
+    generatedCode.textContent = "------";
+    codeInput.value = "";
+    messageInput.value = "";
+    message.textContent = "Tu as quitté la session.";
+
+    messageHistory.innerHTML = "<p>Aucun message pour le moment.</p>";
+    hasMessages = false;
+
+    updateStatus(false);
+
+    socket.connect();
+});
+
+// État du serveur
 socket.on("connect", () => {
     console.log("iControl : serveur connecté");
 });
 
 socket.on("disconnect", (reason) => {
     console.log("iControl : serveur déconnecté :", reason);
+    updateStatus(false);
 });
 
 socket.on("connect_error", (error) => {
     console.log("Erreur de connexion :", error.message);
+    updateStatus(false);
 });

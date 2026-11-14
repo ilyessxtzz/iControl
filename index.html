@@ -32,13 +32,35 @@
 
         <p id="message"></p>
     </div>
+
     <div id="controlArea" hidden>
-    <h2>Panneau de contrôle</h2>
-    <input id="messageInput" type="text" placeholder="Écris un message">
-    <button id="sendBtn">Envoyer</button>
-    <p id="receivedMessage"></p>
-</div>
+        <h2>Panneau de contrôle</h2>
+
+        <p id="connectionStatus">
+            <span id="statusDot">●</span>
+            <span id="statusText">Déconnecté</span>
+        </p>
+
+        <button id="leaveBtn">Quitter la session</button>
+
+        <h3>Messages</h3>
+
+        <div id="messageHistory">
+            <p>Aucun message pour le moment.</p>
+        </div>
+
+        <input
+            id="messageInput"
+            type="text"
+            placeholder="Écris un message"
+            maxlength="300"
+        >
+
+        <button id="sendBtn">Envoyer</button>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
-<script src="script.js"></script>
+    <script src="script.js"></script>
+
 </body>
 </html>
