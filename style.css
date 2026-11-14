@@ -25,8 +25,6 @@ body {
         linear-gradient(145deg, #080b12, #111827 65%, #090d15);
 }
 
-/* Titres */
-
 h1 {
     font-size: clamp(38px, 6vw, 52px);
     font-weight: 700;
@@ -79,7 +77,7 @@ body > p {
     margin-top: 45px;
 }
 
-/* Code de connexion */
+/* Code de connexion généré */
 
 #generatedCode {
     font-size: 42px;
@@ -88,9 +86,75 @@ body > p {
     font-weight: 700;
 }
 
-/* Champs de texte */
+/* Champ à six chiffres */
 
-input {
+.code-entry {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: 60px;
+    margin: 25px auto;
+}
+
+.code-slots {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.code-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    height: 100%;
+
+    color: #ffffff;
+    font-size: 27px;
+    font-weight: 600;
+
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    transition: border-color 0.2s;
+}
+
+.code-entry:focus-within .code-slot.active {
+    border-color: #0a84ff;
+}
+
+.code-slot:not(:empty) {
+    border-color: #65aaff;
+}
+
+/* Champ réel invisible, mais utilisable */
+
+#code {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    opacity: 0.01;
+    color: transparent;
+    caret-color: transparent;
+
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    cursor: text;
+}
+
+/* Champs de texte classiques */
+
+input:not(#code) {
     display: block;
     width: 100%;
     padding: 16px 18px;
@@ -108,7 +172,7 @@ input {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input:focus {
+input:not(#code):focus {
     border-color: #0a84ff;
     box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
 }
@@ -229,5 +293,9 @@ video {
     #generatedCode {
         font-size: 34px;
         letter-spacing: 6px;
+    }
+
+    .code-slots {
+        gap: 9px;
     }
 }

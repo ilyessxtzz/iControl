@@ -10,6 +10,7 @@ const ipadArea = document.getElementById("ipadArea");
 
 const generatedCode = document.getElementById("generatedCode");
 const codeInput = document.getElementById("code");
+const codeSlots = document.querySelectorAll(".code-slot");
 const joinBtn = document.getElementById("joinBtn");
 const message = document.getElementById("message");
 
@@ -21,6 +22,28 @@ const leaveBtn = document.getElementById("leaveBtn");
 const statusDot = document.getElementById("statusDot");
 const statusText = document.getElementById("statusText");
 const messageHistory = document.getElementById("messageHistory");
+
+// Afficher les chiffres dans les six emplacements
+function updateCodeDisplay() {
+    codeInput.value = codeInput.value
+        .replace(/\D/g, "")
+        .slice(0, 6);
+
+    codeSlots.forEach((slot, index) => {
+        slot.textContent = codeInput.value[index] || "";
+        slot.classList.toggle(
+            "active",
+            index === codeInput.value.length &&
+            codeInput.value.length < 6
+        );
+    });
+}
+
+codeInput.addEventListener("input", updateCodeDisplay);
+
+codeInput.addEventListener("focus", updateCodeDisplay);
+
+codeInput.addEventListener("blur", updateCodeDisplay);
 
 // Éléments du partage d'écran
 const screenShareArea = document.getElementById("screenShareArea");
@@ -36,59 +59,22 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Adapter l'orientation et les dimensions de la vidéo reçue
+// Adapter l'orientation de la vidéo selon celle de l'iPhone
 function updateRemoteScreenRatio() {
     const width = remoteScreen.videoWidth;
     const height = remoteScreen.videoHeight;
 
     if (!width || !height) return;
 
-    const ratio = width / height;
-
-    const availableWidth = Math.min(
-        receiverArea.clientWidth || window.innerWidth,
-        window.innerWidth - 32
-    );
-
-    const availableHeight = Math.max(
-        200,
-        window.innerHeight - 220
-    );
-
-    let displayWidth;
-    let displayHeight;
-
     if (width > height) {
-        // iPhone en paysage : rotation de 90° vers la gauche
-        displayWidth = Math.min(
-            availableHeight,
-            availableWidth * ratio
-        );
-
-        displayHeight = displayWidth / ratio;
-
         remoteScreen.style.transform = "rotate(-90deg)";
     } else {
-        // iPhone en portrait : aucune rotation
-        displayWidth = Math.min(
-            availableWidth,
-            availableHeight * ratio
-        );
-
-        displayHeight = displayWidth / ratio;
-
         remoteScreen.style.transform = "none";
     }
-
-    remoteScreen.style.width = `${displayWidth}px`;
-    remoteScreen.style.height = `${displayHeight}px`;
 }
 
 remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
 remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
-
-window.addEventListener("resize", updateRemoteScreenRatio);
-window.addEventListener("orientationchange", updateRemoteScreenRatio);
 
 // Variables générales
 let connected = false;
@@ -641,6 +627,8 @@ leaveBtn.addEventListener("click", () => {
 
     generatedCode.textContent = "------";
     codeInput.value = "";
+    updateCodeDisplay();
+
     messageInput.value = "";
 
     message.textContent = "Tu as quitté la session.";

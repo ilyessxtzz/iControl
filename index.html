@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <h1>iControl</h1>
     <p>Connecte tes appareils en toute simplicité.</p>
 
     <div class="connexion">
         <h2>Choisis ton appareil</h2>
-
         <button id="iphoneBtn">Je suis sur iPhone</button>
         <button id="ipadBtn">Je suis sur iPad</button>
 
@@ -26,7 +24,28 @@
 
         <div id="ipadArea" hidden>
             <h2>Rejoindre un iPhone</h2>
-            <input type="text" id="code" placeholder="Entre le code de connexion">
+
+            <div class="code-entry">
+                <div class="code-slots" aria-hidden="true">
+                    <span class="code-slot active"></span>
+                    <span class="code-slot"></span>
+                    <span class="code-slot"></span>
+                    <span class="code-slot"></span>
+                    <span class="code-slot"></span>
+                    <span class="code-slot"></span>
+                </div>
+
+                <input
+                    type="text"
+                    id="code"
+                    placeholder=""
+                    maxlength="6"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    aria-label="Code de connexion à six chiffres"
+                >
+            </div>
+
             <button id="joinBtn">Rejoindre</button>
         </div>
 
@@ -44,7 +63,6 @@
         <button id="leaveBtn">Quitter la session</button>
 
         <h3>Messages</h3>
-
         <div id="messageHistory">
             <p>Aucun message pour le moment.</p>
         </div>
@@ -68,20 +86,30 @@
             <button id="stopScreenShare" disabled>Arrêter le partage</button>
             <p id="screenShareStatus">Aucun partage en cours.</p>
 
-            <video id="screenPreview" autoplay playsinline muted
-                style="width:100%; max-width:500px;"></video>
+            <video
+                id="screenPreview"
+                autoplay
+                playsinline
+                muted
+                style="width:100%; max-width:500px;"
+            ></video>
         </div>
 
         <div id="receiverArea" hidden>
             <h3>Écran de l'iPhone</h3>
             <p id="remoteScreenStatus">En attente du partage...</p>
-            <video id="remoteScreen" autoplay playsinline controls
-                style="width:100%; max-width:700px; background:#111;"></video>
+
+            <video
+                id="remoteScreen"
+                autoplay
+                playsinline
+                controls
+                style="width:100%; max-width:700px; background:#111;"
+            ></video>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
-
 </body>
 </html>
