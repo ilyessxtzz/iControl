@@ -114,3 +114,14 @@ socket.on("receive-message", (text) => {
         receivedMessage.textContent = text;
     }
 });
+socket.on("connect", () => {
+    console.log("iControl : serveur connecté");
+});
+
+socket.on("disconnect", (reason) => {
+    console.log("iControl : serveur déconnecté :", reason);
+});
+
+socket.on("connect_error", (error) => {
+    console.log("Erreur de connexion :", error.message);
+});
