@@ -59,8 +59,69 @@
         <button id="sendBtn">Envoyer</button>
     </div>
 
+<div id="screenShareArea">
+    <h2>Partage d'écran</h2>
+    <button id="startScreenShare">Partager mon écran</button>
+    <button id="stopScreenShare" disabled>Arrêter le partage</button>
+
+    <p id="screenShareStatus">Aucun partage en cours.</p>
+
+    <video
+        id="screenPreview"
+        autoplay
+        playsinline
+        muted
+        style="width:100%; max-width:500px;"
+    ></video>
+</div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
+
+<script>
+const startButton = document.getElementById("startScreenShare");
+const stopButton = document.getElementById("stopScreenShare");
+const status = document.getElementById("screenShareStatus");
+const preview = document.getElementById("screenPreview");
+
+let screenStream = null;
+
+startButton.addEventListener("click", async () => {
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+        status.textContent =
+            "Le partage d'écran n'est pas pris en charge par ce navigateur.";
+        return;
+    }
+
+    try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: false
+        });
+
+        preview.srcObject = screenStream;
+        stopButton.disabled = false;
+        status.textContent = "Partage d'écran actif.";
+
+        screenStream.getVideoTracks()[0].addEventListener("ended", stopSharing);
+    } catch (error) {
+        status.textContent = "Partage impossible : " + error.message;
+    }
+});
+
+function stopSharing() {
+    if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        screenStream = null;
+    }
+
+    preview.srcObject = null;
+    stopButton.disabled = true;
+    status.textContent = "Partage arrêté.";
+}
+
+stopButton.addEventListener("click", stopSharing);
+</script>
 
 </body>
 </html>
