@@ -59,27 +59,26 @@
         <button id="sendBtn">Envoyer</button>
     </div>
 
+    <div id="screenShareArea" hidden>
+        <h2>Partage d'écran iControl</h2>
 
-<div id="screenShareArea" hidden>
-    <h2>Partage d'écran iControl</h2>
+        <div id="senderArea" hidden>
+            <h3>Mon écran</h3>
+            <button id="startScreenShare">Partager mon écran</button>
+            <button id="stopScreenShare" disabled>Arrêter le partage</button>
+            <p id="screenShareStatus">Aucun partage en cours.</p>
 
-    <div id="senderArea" hidden>
-        <h3>Mon écran</h3>
-        <button id="startScreenShare">Partager mon écran</button>
-        <button id="stopScreenShare" disabled>Arrêter le partage</button>
-        <p id="screenShareStatus">Aucun partage en cours.</p>
+            <video id="screenPreview" autoplay playsinline muted
+                style="width:100%; max-width:500px;"></video>
+        </div>
 
-        <video id="screenPreview" autoplay playsinline muted
-            style="width:100%; max-width:500px;"></video>
+        <div id="receiverArea" hidden>
+            <h3>Écran de l'iPhone</h3>
+            <p id="remoteScreenStatus">En attente du partage...</p>
+            <video id="remoteScreen" autoplay playsinline controls
+                style="width:100%; max-width:700px; background:#111;"></video>
+        </div>
     </div>
-
-    <div id="receiverArea" hidden>
-        <h3>Écran de l'iPhone</h3>
-        <p id="remoteScreenStatus">En attente du partage...</p>
-        <video id="remoteScreen" autoplay playsinline
-            style="width:100%; max-width:700px; background:#111;"></video>
-    </div>
-</div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
