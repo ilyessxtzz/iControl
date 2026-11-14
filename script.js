@@ -321,7 +321,8 @@ startScreenShare.addEventListener("click", async () => {
             });
 
         screenStream = stream;
-
+const track = stream.getVideoTracks()[0];
+console.log("Dimensions capturées :", track.getSettings());
         screenPreview.srcObject = stream;
         screenPreview.play().catch(() => {});
 
