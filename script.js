@@ -36,17 +36,40 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
-// Adapter automatiquement le format de la vidéo reçue
+// Adapter la taille de la vidéo à son orientation réelle
 function updateRemoteScreenRatio() {
     const width = remoteScreen.videoWidth;
     const height = remoteScreen.videoHeight;
 
-    if (width && height) {
-        remoteScreen.style.aspectRatio = `${width} / ${height}`;
-    }
+    if (!width || !height) return;
+
+    const ratio = width / height;
+
+    const availableWidth = Math.min(
+        receiverArea.clientWidth || window.innerWidth,
+        window.innerWidth - 32
+    );
+
+    const availableHeight = window.innerHeight * 0.82;
+
+    const displayWidth = Math.min(
+        availableWidth,
+        availableHeight * ratio
+    );
+
+    const displayHeight = displayWidth / ratio;
+
+    remoteScreen.style.width = `${displayWidth}px`;
+    remoteScreen.style.height = `${displayHeight}px`;
+    remoteScreen.style.maxWidth = "none";
+    remoteScreen.style.aspectRatio = `${width} / ${height}`;
 }
 
+remoteScreen.addEventListener("loadedmetadata", updateRemoteScreenRatio);
 remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
+
+window.addEventListener("resize", updateRemoteScreenRatio);
+window.addEventListener("orientationchange", updateRemoteScreenRatio);
 
 // Variables générales
 let connected = false;
@@ -321,8 +344,10 @@ startScreenShare.addEventListener("click", async () => {
             });
 
         screenStream = stream;
-const track = stream.getVideoTracks()[0];
-console.log("Dimensions capturées :", track.getSettings());
+
+        const track = stream.getVideoTracks()[0];
+        console.log("Dimensions capturées :", track.getSettings());
+
         screenPreview.srcObject = stream;
         screenPreview.play().catch(() => {});
 
