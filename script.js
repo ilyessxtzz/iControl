@@ -1,3 +1,4 @@
+const socket = io();
 
 const iphoneBtn = document.getElementById("iphoneBtn");
 const ipadBtn = document.getElementById("ipadBtn");
@@ -10,22 +11,28 @@ const codeInput = document.getElementById("code");
 const joinBtn = document.getElementById("joinBtn");
 const message = document.getElementById("message");
 
-iphoneBtn.addEventListener("click", function() {
+iphoneBtn.addEventListener("click", () => {
     iphoneArea.hidden = false;
     ipadArea.hidden = true;
-    message.textContent = "";
+    message.textContent = "Création de la connexion...";
 
-    const code = Math.floor(100000 + Math.random() * 900000);
-    generatedCode.textContent = code;
+    socket.emit("create-room", (result) => {
+        if (result.success) {
+            generatedCode.textContent = result.code;
+            message.textContent = "En attente de l'iPad...";
+        } else {
+            message.textContent = "Impossible de créer la connexion.";
+        }
+    });
 });
 
-ipadBtn.addEventListener("click", function() {
+ipadBtn.addEventListener("click", () => {
     ipadArea.hidden = false;
     iphoneArea.hidden = true;
     message.textContent = "";
 });
 
-joinBtn.addEventListener("click", function() {
+joinBtn.addEventListener("click", () => {
     const code = codeInput.value.trim();
 
     if (!/^\d{6}$/.test(code)) {
@@ -33,5 +40,21 @@ joinBtn.addEventListener("click", function() {
         return;
     }
 
-    message.textContent = "Code saisi : " + code;
+    message.textContent = "Connexion en cours...";
+
+    socket.emit("join-room", code, (result) => {
+        if (result.success) {
+            message.textContent = "iPad connecté à la session !";
+        } else {
+            message.textContent = result.message;
+        }
+    });
+});
+
+socket.on("peer-joined", () => {
+    message.textContent = "Ton iPad est connecté !";
+});
+
+socket.on("peer-left", () => {
+    message.textContent = "L'autre appareil s'est déconnecté.";
 });
