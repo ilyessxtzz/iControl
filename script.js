@@ -36,6 +36,18 @@ const remoteScreenStatus = document.getElementById("remoteScreenStatus");
 const screenPreview = document.getElementById("screenPreview");
 const remoteScreen = document.getElementById("remoteScreen");
 
+// Adapter automatiquement le format de la vidéo reçue
+function updateRemoteScreenRatio() {
+    const width = remoteScreen.videoWidth;
+    const height = remoteScreen.videoHeight;
+
+    if (width && height) {
+        remoteScreen.style.aspectRatio = `${width} / ${height}`;
+    }
+}
+
+remoteScreen.addEventListener("resize", updateRemoteScreenRatio);
+
 // Variables générales
 let connected = false;
 let hasMessages = false;
