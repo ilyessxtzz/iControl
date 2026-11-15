@@ -3,109 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iControl</title>
+    <title>Calculatrice</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>iControl</h1>
-    <p>Connecte tes appareils en toute simplicité.</p>
+    <main id="calculatorArea" class="calculator-page">
+        <h1>Calculatrice</h1>
+        <p class="calculator-subtitle">Effectue tes calculs simplement.</p>
 
-    <div class="connexion">
-        <h2>Choisis ton appareil</h2>
-        <button id="iphoneBtn">Je suis sur iPhone</button>
-        <button id="ipadBtn">Je suis sur iPad</button>
+        <section class="calculator" aria-label="Calculatrice">
+            <label class="sr-only" for="calculatorDisplay">Écran de la calculatrice</label>
+            <input id="calculatorDisplay" class="calculator-display" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Calcul à effectuer">
 
-        <div id="iphoneArea" hidden>
-            <h2>Ton code de connexion</h2>
-            <h1 id="generatedCode">------</h1>
-            <p>Entre ce code sur ton iPad.</p>
-        </div>
-
-        <div id="ipadArea" hidden>
-            <h2>Rejoindre un iPhone</h2>
-
-            <div class="code-entry">
-                <div class="code-slots" aria-hidden="true">
-                    <span class="code-slot active"></span>
-                    <span class="code-slot"></span>
-                    <span class="code-slot"></span>
-                    <span class="code-slot"></span>
-                    <span class="code-slot"></span>
-                    <span class="code-slot"></span>
-                </div>
-
-                <input
-                    type="text"
-                    id="code"
-                    placeholder=""
-                    maxlength="6"
-                    inputmode="numeric"
-                    autocomplete="one-time-code"
-                    aria-label="Code de connexion à six chiffres"
-                >
+            <div class="calculator-keys">
+                <button type="button" class="calc-clear" data-calc="clear">AC</button>
+                <button type="button" data-calc="backspace">⌫</button>
+                <button type="button" data-value="(">(</button>
+                <button type="button" data-value=")">)</button>
+                <button type="button" data-value="7">7</button>
+                <button type="button" data-value="8">8</button>
+                <button type="button" data-value="9">9</button>
+                <button type="button" class="calc-operator" data-value="÷">÷</button>
+                <button type="button" data-value="4">4</button>
+                <button type="button" data-value="5">5</button>
+                <button type="button" data-value="6">6</button>
+                <button type="button" class="calc-operator" data-value="×">×</button>
+                <button type="button" data-value="1">1</button>
+                <button type="button" data-value="2">2</button>
+                <button type="button" data-value="3">3</button>
+                <button type="button" class="calc-operator" data-value="−">−</button>
+                <button type="button" data-value="0">0</button>
+                <button type="button" data-value=".">.</button>
+                <button type="button" data-value=":">:</button>
+                <button type="button" class="calc-operator" data-value="+">+</button>
+                <button type="button" class="calc-equals" data-calc="equals">=</button>
             </div>
 
-            <button id="joinBtn">Rejoindre</button>
+            <p id="calculatorMessage" class="calculator-message" role="status" aria-live="polite"></p>
+
+            <div class="icalc-prompt">
+                <p>Tu veux utiliser le service iControl ?</p>
+                <button type="button" id="openIControlBtn">Ouvrir iControl</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="appContent" hidden>
+        <h1>iControl</h1>
+        <p>Connecte tes appareils en toute simplicité.</p>
+
+        <div class="connexion">
+            <h2>Choisis ton appareil</h2>
+            <button id="iphoneBtn">Je suis sur iPhone</button>
+            <button id="ipadBtn">Je suis sur iPad</button>
+
+            <div id="iphoneArea" hidden>
+                <h2>Ton code de connexion</h2>
+                <h1 id="generatedCode">------</h1>
+                <p>Entre ce code sur ton iPad.</p>
+            </div>
+
+            <div id="ipadArea" hidden>
+                <h2>Rejoindre un iPhone</h2>
+
+                <div class="code-entry">
+                    <div class="code-slots" aria-hidden="true">
+                        <span class="code-slot active"></span>
+                        <span class="code-slot"></span>
+                        <span class="code-slot"></span>
+                        <span class="code-slot"></span>
+                        <span class="code-slot"></span>
+                        <span class="code-slot"></span>
+                    </div>
+
+                    <input
+                        type="text"
+                        id="code"
+                        placeholder=""
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        aria-label="Code de connexion à six chiffres"
+                    >
+                </div>
+
+                <button id="joinBtn">Rejoindre</button>
+            </div>
+
+            <p id="message"></p>
         </div>
 
-        <p id="message"></p>
-    </div>
+        <div id="controlArea" hidden>
+            <h2>Panneau de contrôle</h2>
 
-    <div id="controlArea" hidden>
-        <h2>Panneau de contrôle</h2>
+            <p id="connectionStatus">
+                <span id="statusDot">●</span>
+                <span id="statusText">Déconnecté</span>
+            </p>
 
-        <p id="connectionStatus">
-            <span id="statusDot">●</span>
-            <span id="statusText">Déconnecté</span>
-        </p>
+            <button id="leaveBtn">Quitter la session</button>
 
-        <button id="leaveBtn">Quitter la session</button>
+            <h3>Messages</h3>
+            <div id="messageHistory">
+                <p>Aucun message pour le moment.</p>
+            </div>
 
-        <h3>Messages</h3>
-        <div id="messageHistory">
-            <p>Aucun message pour le moment.</p>
+            <input
+                id="messageInput"
+                type="text"
+                placeholder="Écris un message"
+                maxlength="300"
+            >
+
+            <button id="sendBtn">Envoyer</button>
         </div>
 
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="Écris un message"
-            maxlength="300"
-        >
+        <div id="screenShareArea" hidden>
+            <h2>Partage d'écran iControl</h2>
 
-        <button id="sendBtn">Envoyer</button>
-    </div>
+            <div id="senderArea" hidden>
+                <h3>Mon écran</h3>
+                <button id="startScreenShare">Partager mon écran</button>
+                <button id="stopScreenShare" disabled>Arrêter le partage</button>
+                <p id="screenShareStatus">Aucun partage en cours.</p>
 
-    <div id="screenShareArea" hidden>
-        <h2>Partage d'écran iControl</h2>
+                <video
+                    id="screenPreview"
+                    autoplay
+                    playsinline
+                    muted
+                    style="width:100%; max-width:500px;"
+                ></video>
+            </div>
 
-        <div id="senderArea" hidden>
-            <h3>Mon écran</h3>
-            <button id="startScreenShare">Partager mon écran</button>
-            <button id="stopScreenShare" disabled>Arrêter le partage</button>
-            <p id="screenShareStatus">Aucun partage en cours.</p>
+            <div id="receiverArea" hidden>
+                <h3>Écran de l'iPhone</h3>
+                <p id="remoteScreenStatus">En attente du partage...</p>
 
-            <video
-                id="screenPreview"
-                autoplay
-                playsinline
-                muted
-                style="width:100%; max-width:500px;"
-            ></video>
+                <video
+                    id="remoteScreen"
+                    autoplay
+                    playsinline
+                    controls
+                    style="width:100%; max-width:700px; background:#111;"
+                ></video>
+            </div>
         </div>
 
-        <div id="receiverArea" hidden>
-            <h3>Écran de l'iPhone</h3>
-            <p id="remoteScreenStatus">En attente du partage...</p>
-
-            <video
-                id="remoteScreen"
-                autoplay
-                playsinline
-                controls
-                style="width:100%; max-width:700px; background:#111;"
-            ></video>
-        </div>
+        <button type="button" id="backToCalculatorBtn" class="secondary-button">
+            Retour à la calculatrice
+        </button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

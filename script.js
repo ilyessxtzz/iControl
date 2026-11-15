@@ -690,3 +690,178 @@ socket.on("connect_error", (error) => {
     console.log("Erreur de connexion :", error.message);
     updateStatus(false);
 });
+
+// Calculatrice d'accueil et accès clairement indiqué à iControl.
+const calculatorArea = document.getElementById("calculatorArea");
+const calculatorDisplay = document.getElementById("calculatorDisplay");
+const calculatorMessage = document.getElementById("calculatorMessage");
+const openIControlBtn = document.getElementById("openIControlBtn");
+const appContent = document.getElementById("appContent");
+const backToCalculatorBtn = document.getElementById("backToCalculatorBtn");
+
+function calculateExpression(expression) {
+    const normalized = expression
+        .replace(/×/g, "*")
+        .replace(/[÷:]/g, "/")
+        .replace(/−/g, "-")
+        .replace(/,/g, ".")
+        .replace(/\s+/g, "");
+
+    if (!normalized || !/^[0-9.+\-*/()]+$/.test(normalized)) {
+        throw new Error("Expression invalide.");
+    }
+
+    let index = 0;
+
+    function parseExpression() {
+        let value = parseTerm();
+
+        while (
+            normalized[index] === "+" ||
+            normalized[index] === "-"
+        ) {
+            const operator = normalized[index++];
+            const right = parseTerm();
+
+            value = operator === "+"
+                ? value + right
+                : value - right;
+        }
+
+        return value;
+    }
+
+    function parseTerm() {
+        let value = parseFactor();
+
+        while (
+            normalized[index] === "*" ||
+            normalized[index] === "/"
+        ) {
+            const operator = normalized[index++];
+            const right = parseFactor();
+
+            if (operator === "/" && right === 0) {
+                throw new Error("Division par zéro impossible.");
+            }
+
+            value = operator === "*"
+                ? value * right
+                : value / right;
+        }
+
+        return value;
+    }
+
+    function parseFactor() {
+        if (normalized[index] === "+") {
+            index++;
+            return parseFactor();
+        }
+
+        if (normalized[index] === "-") {
+            index++;
+            return -parseFactor();
+        }
+
+        if (normalized[index] === "(") {
+            index++;
+
+            const value = parseExpression();
+
+            if (normalized[index] !== ")") {
+                throw new Error("Parenthèses incorrectes.");
+            }
+
+            index++;
+            return value;
+        }
+
+        const match = normalized
+            .slice(index)
+            .match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+
+        if (!match) {
+            throw new Error("Expression invalide.");
+        }
+
+        index += match[0].length;
+        return Number(match[0]);
+    }
+
+    const result = parseExpression();
+
+    if (index !== normalized.length || !Number.isFinite(result)) {
+        throw new Error("Expression invalide.");
+    }
+
+    return result;
+}
+
+function runCalculation() {
+    try {
+        const result = calculateExpression(
+            calculatorDisplay.value.trim()
+        );
+
+        calculatorDisplay.value = String(
+            Number(result.toFixed(10))
+        );
+
+        calculatorMessage.textContent =
+            "Résultat : " + calculatorDisplay.value;
+
+    } catch (error) {
+        calculatorMessage.textContent = error.message;
+    }
+}
+
+// Touches de la calculatrice
+document.querySelectorAll("[data-value]").forEach((button) => {
+    button.addEventListener("click", () => {
+        calculatorDisplay.value += button.dataset.value;
+        calculatorMessage.textContent = "";
+        calculatorDisplay.focus();
+    });
+});
+
+// Actions de la calculatrice
+document.querySelectorAll("[data-calc]").forEach((button) => {
+    button.addEventListener("click", () => {
+        const action = button.dataset.calc;
+
+        if (action === "clear") {
+            calculatorDisplay.value = "";
+            calculatorMessage.textContent = "";
+
+        } else if (action === "backspace") {
+            calculatorDisplay.value =
+                calculatorDisplay.value.slice(0, -1);
+
+        } else if (action === "equals") {
+            runCalculation();
+        }
+    });
+});
+
+// Calcul avec la touche Entrée
+calculatorDisplay.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === "=") {
+        event.preventDefault();
+        runCalculation();
+    }
+});
+
+// Ouvrir iControl sans changer l'adresse ni recharger la page
+openIControlBtn.addEventListener("click", () => {
+    calculatorArea.hidden = true;
+    appContent.hidden = false;
+    document.title = "iControl";
+});
+
+// Retour à la calculatrice
+backToCalculatorBtn.addEventListener("click", () => {
+    appContent.hidden = true;
+    calculatorArea.hidden = false;
+    document.title = "Calculatrice";
+});

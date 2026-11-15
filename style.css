@@ -1,3 +1,6 @@
+/* ================================
+   iCONTROL — DESIGN APPLE
+================================ */
 
 * {
     box-sizing: border-box;
@@ -15,6 +18,7 @@ body {
     padding: 65px 20px;
     text-align: center;
     color: #f5f5f7;
+
     background:
         radial-gradient(ellipse at 50% 0%, #1c3152 0%, transparent 55%),
         linear-gradient(145deg, #080b12, #111827 65%, #090d15);
@@ -45,6 +49,8 @@ body > p {
     font-size: 16px;
 }
 
+/* Cartes */
+
 .connexion,
 #controlArea,
 #screenShareArea {
@@ -52,12 +58,15 @@ body > p {
     max-width: 650px;
     margin: 30px auto;
     padding: 30px;
+
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 24px;
+
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
 }
@@ -67,12 +76,16 @@ body > p {
     margin-top: 45px;
 }
 
+/* Code de connexion généré */
+
 #generatedCode {
     font-size: 42px;
     letter-spacing: 9px;
     color: #65aaff;
     font-weight: 700;
 }
+
+/* Champ à six chiffres */
 
 .code-entry {
     position: relative;
@@ -95,11 +108,14 @@ body > p {
     display: flex;
     align-items: center;
     justify-content: center;
+
     min-width: 0;
     height: 100%;
+
     color: #ffffff;
     font-size: 27px;
     font-weight: 600;
+
     border-bottom: 2px solid rgba(255, 255, 255, 0.3);
     transition: border-color 0.2s;
 }
@@ -112,17 +128,22 @@ body > p {
     border-color: #65aaff;
 }
 
+/* Champ réel invisible, mais utilisable */
+
 #code {
     position: absolute;
     inset: 0;
     z-index: 2;
+
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
+
     opacity: 0.01;
     color: transparent;
     caret-color: transparent;
+
     background: transparent;
     border: none;
     outline: none;
@@ -130,17 +151,23 @@ body > p {
     cursor: text;
 }
 
+/* Champs de texte classiques */
+
 input:not(#code) {
     display: block;
     width: 100%;
     padding: 16px 18px;
     margin: 16px 0;
+
     color: white;
     background: rgba(0, 0, 0, 0.22);
+
     border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: 14px;
+
     font-size: 16px;
     outline: none;
+
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -153,16 +180,22 @@ input::placeholder {
     color: #8993a4;
 }
 
+/* Boutons */
+
 button {
     width: 100%;
     padding: 15px 20px;
     margin: 7px 0;
+
     color: white;
     background: #0a84ff;
+
     border: none;
     border-radius: 14px;
+
     font-size: 16px;
     font-weight: 600;
+
     cursor: pointer;
     transition:
         background 0.2s,
@@ -185,6 +218,8 @@ button:disabled {
     transform: none;
 }
 
+/* Messages */
+
 #message {
     color: #64adff;
     margin-top: 20px;
@@ -195,10 +230,13 @@ button:disabled {
     padding: 12px;
     margin: 15px 0;
     text-align: left;
+
     background: rgba(0, 0, 0, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 14px;
 }
+
+/* État de connexion */
 
 #connectionStatus {
     color: #aab4c5;
@@ -208,62 +246,159 @@ button:disabled {
     color: #ff453a;
 }
 
-.video-container {
-    position: relative;
-    width: 100%;
-    max-width: 700px;
+/* Vidéos */
+
+video {
+    display: block;
+    max-width: 100%;
     margin: 18px auto;
-    overflow: hidden;
     border-radius: 18px;
     background: #000;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
 }
 
-.video-container video {
-    display: block;
+#remoteScreen {
+    transform-origin: center center;
+}
+
+/* ================================
+   CALCULATRICE
+================================ */
+
+.calculator-page {
     width: 100%;
-    max-width: 100%;
-    height: auto;
+    max-width: 430px;
+    margin: 0 auto;
+}
+
+.calculator-page h1 {
+    margin-bottom: 8px;
+}
+
+.calculator-subtitle {
+    color: #a1a9b8;
+    margin-bottom: 30px;
+}
+
+.calculator {
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 28px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
+
+.calculator-display {
+    width: 100%;
+    min-height: 85px;
+    margin: 0 0 20px;
+    padding: 15px;
+
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+
+    font-size: 32px;
+    font-weight: 500;
+    text-align: right;
+}
+
+.calculator-keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.calculator-keys button {
+    min-height: 58px;
     margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    background: #000;
+    padding: 10px;
+
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+
+    font-size: 20px;
 }
 
-#senderVideoContainer {
-    max-width: 500px;
+.calculator-keys button:hover {
+    background: rgba(255, 255, 255, 0.17);
 }
 
-#touchSurface {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    touch-action: none;
-    cursor: crosshair;
+.calculator-keys .calc-operator {
+    background: rgba(10, 132, 255, 0.3);
+    color: #65b5ff;
 }
 
-.remote-pointer {
-    position: absolute;
-    z-index: 4;
-    width: 22px;
-    height: 22px;
-    border: 3px solid white;
-    border-radius: 50%;
-    background: rgba(10, 132, 255, 0.7);
-    box-shadow: 0 0 0 5px rgba(10, 132, 255, 0.25);
-    transform: translate(-50%, -50%);
-    pointer-events: none;
+.calculator-keys .calc-clear {
+    background: rgba(255, 69, 58, 0.2);
+    color: #ff7770;
 }
 
-.touch-instruction,
-#touchStatus {
-    color: #aab4c5;
+.calculator-keys .calc-equals {
+    grid-column: span 4;
+    background: #0a84ff;
+    color: white;
+}
+
+.calculator-message {
+    min-height: 24px;
+    color: #65aaff;
+    font-size: 15px;
+}
+
+.icalc-prompt {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.icalc-prompt p {
+    color: #a1a9b8;
     font-size: 14px;
 }
+
+.icalc-prompt button {
+    margin-top: 8px;
+}
+
+.secondary-button {
+    display: block;
+    max-width: 300px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.secondary-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Éléments masqués */
 
 [hidden] {
     display: none !important;
 }
+
+/* Adaptation mobile */
 
 @media (max-width: 600px) {
     body {
@@ -292,5 +427,17 @@ button:disabled {
 
     .code-slots {
         gap: 9px;
+    }
+
+    .calculator {
+        padding: 18px;
+    }
+
+    .calculator-keys {
+        gap: 8px;
+    }
+
+    .calculator-keys button {
+        min-height: 54px;
     }
 }
