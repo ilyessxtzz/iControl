@@ -691,13 +691,30 @@ socket.on("connect_error", (error) => {
     updateStatus(false);
 });
 
-// Calculatrice d'accueil et accès clairement indiqué à iControl.
+
+// CALCULATRICE D'ACCUEIL
+
 const calculatorArea = document.getElementById("calculatorArea");
 const calculatorDisplay = document.getElementById("calculatorDisplay");
 const calculatorMessage = document.getElementById("calculatorMessage");
 const openIControlBtn = document.getElementById("openIControlBtn");
 const appContent = document.getElementById("appContent");
 const backToCalculatorBtn = document.getElementById("backToCalculatorBtn");
+
+// Le bouton est caché au départ.
+function hideIControlButton() {
+    openIControlBtn.hidden = true;
+    openIControlBtn.style.display = "none";
+}
+
+// Afficher le bouton après le calcul demandé.
+function showIControlButton() {
+    openIControlBtn.hidden = false;
+    openIControlBtn.style.display = "";
+}
+
+// Masquer le bouton dès le chargement.
+hideIControlButton();
 
 function calculateExpression(expression) {
     const normalized = expression
@@ -799,26 +816,46 @@ function calculateExpression(expression) {
 }
 
 function runCalculation() {
+    // Garder l'expression saisie avant d'afficher le résultat.
+    const originalExpression = calculatorDisplay.value
+        .replace(/\s+/g, "");
+
+    // Cacher le bouton avant chaque nouveau calcul.
+    hideIControlButton();
+
     try {
         const result = calculateExpression(
             calculatorDisplay.value.trim()
         );
 
-        calculatorDisplay.value = String(
+        const displayedResult = String(
             Number(result.toFixed(10))
         );
 
+        calculatorDisplay.value = displayedResult;
+
         calculatorMessage.textContent =
-            "Résultat : " + calculatorDisplay.value;
+            "Résultat : " + displayedResult;
+
+        // Le bouton apparaît uniquement après le calcul exact 24:2.
+        if (
+            originalExpression === "24:2" &&
+            displayedResult === "12"
+        ) {
+            showIControlButton();
+        }
 
     } catch (error) {
         calculatorMessage.textContent = error.message;
+        hideIControlButton();
     }
 }
 
 // Touches de la calculatrice
 document.querySelectorAll("[data-value]").forEach((button) => {
     button.addEventListener("click", () => {
+        hideIControlButton();
+
         calculatorDisplay.value += button.dataset.value;
         calculatorMessage.textContent = "";
         calculatorDisplay.focus();
@@ -833,15 +870,24 @@ document.querySelectorAll("[data-calc]").forEach((button) => {
         if (action === "clear") {
             calculatorDisplay.value = "";
             calculatorMessage.textContent = "";
+            hideIControlButton();
 
         } else if (action === "backspace") {
             calculatorDisplay.value =
                 calculatorDisplay.value.slice(0, -1);
 
+            hideIControlButton();
+
         } else if (action === "equals") {
             runCalculation();
         }
     });
+});
+
+// Si l'utilisateur modifie directement le texte, cacher le bouton.
+calculatorDisplay.addEventListener("input", () => {
+    hideIControlButton();
+    calculatorMessage.textContent = "";
 });
 
 // Calcul avec la touche Entrée
@@ -852,7 +898,7 @@ calculatorDisplay.addEventListener("keydown", (event) => {
     }
 });
 
-// Ouvrir iControl sans changer l'adresse ni recharger la page
+// Ouvrir iControl sans changer l'adresse ni recharger la page.
 openIControlBtn.addEventListener("click", () => {
     calculatorArea.hidden = true;
     appContent.hidden = false;
@@ -864,4 +910,9 @@ backToCalculatorBtn.addEventListener("click", () => {
     appContent.hidden = true;
     calculatorArea.hidden = false;
     document.title = "Calculatrice";
+
+    calculatorDisplay.value = "";
+    calculatorMessage.textContent = "";
+
+    hideIControlButton();
 });
